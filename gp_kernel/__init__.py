@@ -1,4 +1,4 @@
-"""A magma kernel for Jupyter"""
+"""A gp kernel for Jupyter"""
 
 from codecs import open
 from os import path

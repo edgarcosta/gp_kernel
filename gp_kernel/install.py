@@ -7,10 +7,10 @@ from jupyter_client.kernelspec import install_kernel_spec
 from IPython.utils.tempdir import TemporaryDirectory
 
 kernel_json = {
-    "argv": [sys.executable, "-m", "magma_kernel", "-f", "{connection_file}"],
-    "display_name": "Magma",
-    "language": "magma",
-    "codemirror_mode": "pascal",
+    "argv": [sys.executable, "-m", "gp_kernel", "-f", "{connection_file}"],
+    "display_name": "PARI/GP (unofficial)",
+    "language": "gp",
+    "codemirror_mode": "c",
     "env": {"PS1": "$"},
 }
 
@@ -21,10 +21,10 @@ def install_my_kernel_spec(user=True):
         with open(os.path.join(td, "kernel.json"), "w") as f:
             json.dump(kernel_json, f, sort_keys=True)
         # TODO: Copy resources once they're specified
-        shutil.copy("magma_kernel/logo-64x64.png", td)
+        shutil.copy("gp_kernel/logo-64x64.png", td)
 
         print("Installing IPython kernel spec")
-        install_kernel_spec(td, "magma", user=user, replace=True)
+        install_kernel_spec(td, "gp", user=user, replace=True)
 
 
 def _is_root():
