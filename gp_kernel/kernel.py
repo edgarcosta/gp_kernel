@@ -1308,9 +1308,8 @@ class GPKernel(Kernel):
         }
         if not code or code[-1] == " ":
             return default
-        # FIXME: not sure how to do this yet
 
-        # optimizing to not send everything
+        # get last token
         token = code[:cursor_pos]
         for sep in ["\n", ";", " "]:  # we just need the last chunk
             token = token.rpartition(sep)[-1]
