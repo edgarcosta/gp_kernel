@@ -1190,6 +1190,7 @@ class GPKernel(Kernel):
         read_characters = [0]
 
         def wait_for_output(read_characters, filename=None):
+            read_characters[0] = 0
             # this function will *modify* the read_characters[0]
             # handle error messages with filename
             # output output initially on intervals of 0.5 seconds
