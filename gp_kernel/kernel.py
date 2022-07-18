@@ -1117,7 +1117,7 @@ gp_builtins = [
 class GPKernel(Kernel):
     implementation = "gp_kernel"
     implementation_version = __version__
-    _prompt = ">PEXPECT_PROMPT<"
+    _prompt = "$#PEXPECT_PROMPT#$"
 
     language_info = {
         "name": "gp",
@@ -1140,7 +1140,6 @@ class GPKernel(Kernel):
     def __init__(self, **kwargs):
         Kernel.__init__(self, **kwargs)
         # sets child, banner, language_info, language_version
-
         self._start_gp()
 
     def _start_gp(self):
@@ -1199,8 +1198,10 @@ class GPKernel(Kernel):
             initial_timeout = timeout = 0.1
 
             while True:
-                v = self.child.expect_exact([self._prompt, TIMEOUT], timeout=timeout)
+                v = self.child.expect_exact([self._prompt], timeout=timeout)
 
+                self.debug(f"v= {v}")
+                self.debug(f"self.child.before = {repr(self.child.before)}")
                 # something in output
                 if not silent and len(self.child.before) > read_characters[0]:
                     output = self.child.before[read_characters[0] :]
@@ -1246,25 +1247,17 @@ class GPKernel(Kernel):
         self.debug("before try")
         self.debug(f"{len(code)} {self.max_input_line_size}")
         try:
-            # if the code block is long write it into a file and load it in gp
-            # this takes about as the same time as sending a single line, and thus
-            # we check the length of the whole code block
-            # WARNING: the more obvious workaround of splitting each long line into
-            # several small escaped lines, doesn't work, as we hit other system limits.
-            # For example, I wasn't able to send a line longer that 2^16 character.
-            if len(code) > self.max_input_line_size:
-                # send the line via a temporary file
-                with NamedTemporaryFile("w+t") as tmpfile:
+            # send the code via a temporary file
+            # trying to send small code directly is weird, as we get different number of
+            # prompts
+            with NamedTemporaryFile("w+t") as tmpfile:
 
-                    self.debug(tmpfile.name)
-                    tmpfile.write(code)
-                    tmpfile.flush()
-                    fsync(tmpfile.fileno())
-                    self.child.sendline(f'read("{tmpfile.name}");')
-                    wait_for_output(read_characters, tmpfile.name)
-            else:
-                self.child.sendline(code)
-                wait_for_output(read_characters)
+                self.debug(tmpfile.name)
+                tmpfile.write(code)
+                tmpfile.flush()
+                fsync(tmpfile.fileno())
+                self.child.sendline(fr'\r {tmpfile.name}')
+                wait_for_output(read_characters, tmpfile.name)
         except KeyboardInterrupt:
             self.debug("KeyboardInterrupt")
             self.child.sendintr()
@@ -1291,6 +1284,7 @@ class GPKernel(Kernel):
         if interrupted:
             return {"status": "abort", "execution_count": self.execution_count}
 
+        self.debug(self.child.before)
         return {
             "status": "ok",
             "execution_count": self.execution_count,
