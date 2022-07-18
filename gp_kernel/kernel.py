@@ -1198,7 +1198,7 @@ class GPKernel(Kernel):
             initial_timeout = timeout = 0.1
 
             while True:
-                v = self.child.expect_exact([self._prompt], timeout=timeout)
+                v = self.child.expect_exact([self._prompt, TIMEOUT], timeout=timeout)
 
                 self.debug(f"v= {v}")
                 self.debug(f"self.child.before = {repr(self.child.before)}")
@@ -1306,7 +1306,7 @@ class GPKernel(Kernel):
 
         # get last token
         token = code[:cursor_pos]
-        for sep in ["\n", ";", " "]:  # we just need the last chunk
+        for sep in ["\n", ";", " ", "("]:  # we just need the last chunk
             token = token.rpartition(sep)[-1]
         if not token:
             return default
