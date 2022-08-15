@@ -8,7 +8,7 @@ from IPython.utils.tempdir import TemporaryDirectory
 
 kernel_json = {
     "argv": [sys.executable, "-m", "gp_kernel", "-f", "{connection_file}"],
-    "display_name": "PARI/GP (unofficial)",
+    "display_name": "PARI/GP",
     "language": "gp",
     "codemirror_mode": "c",
     "env": {"PS1": "$"},
