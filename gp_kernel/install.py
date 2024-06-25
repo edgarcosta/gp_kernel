@@ -58,7 +58,7 @@ def main(argv=None):
         default=None
     )
 
-    args = parser.parse_args(argv)
+    args, _ = parser.parse_known_args(argv)
 
     user = False
     prefix = None
